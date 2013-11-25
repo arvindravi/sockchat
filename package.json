@@ -1,0 +1,22 @@
+{
+  "name": "hellosocket",
+  "version": "0.0.0-1",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [
+    "helloworld"
+  ],
+  "author": "Arvind",
+  "license": "BSD",
+  "dependencies": {
+    "socket.io": "~0.9.16"
+  },
+  "subdomain": "arvindravi-hellosocket",
+  "engines": {
+    "node": "0.10.x"
+  }
+}

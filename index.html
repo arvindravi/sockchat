@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Hello Socket!</title>
+	<style>
+		#chat {
+			visibility: hidden;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div id="people">
+			<ul id="people" class="unstyled"></ul>
+		</div>
+		<br>
+		<div id="chat_feed">
+			<ul id="msgs" class="unstyled"></ul>
+		</div>
+		<br>
+		<div id="login">
+			<form id="1">
+				<input type="text" placeholder="Your Name" id="name">
+				<input type="button" id="join" name="join" value="Join">
+			</form>
+		</div>
+		<div id="chat">
+			<form id="2">
+				<input type="text" placeholder="Your message" id="msg">
+				<input type="button" id="send" value="send" name="send">
+			</form>
+		</div>
+	</div>
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.js"></script>
+	<script>
+		var socket = io.connect();
+		$('#name').focus();
+		$("form").submit(function(e){
+			e.preventDefault();
+		});
+
+		$('#join').click(function(){
+			var name = $('#name').val();
+			if(name != ""){
+				socket.emit('join', name);
+				$('#login').detach();
+				$('#chat').css("visibility", "visible");
+				$('#msg').focus();
+				ready = true;
+			}
+		});
+
+		$('#name').keypress(function(e){
+			if(e.which == 13){
+				socket.emit('join', name);
+				$('#login').detach();
+				$('#chat').css("visibility", "visible");
+				$('#msg').focus();
+			}
+		});
+
+		socket.on('update', function(msg){
+			if(ready){
+				$('#msgs').append("- " + msg + " ");
+			}
+		});
+
+		socket.on('update-people', function(people){
+			if(ready){
+				$('#people').empty();
+				$.each(people, function(clientid, name){
+					$('#people').append("- " + name + " ");
+				});
+			}
+		});
+
+		socket.on('chat', function(who, msg){
+			if(ready){
+				$('#msgs').append("<br /><b>" + who + "</b> says: " + msg + "<br/> ");
+			}
+		});
+
+		socket.on('disconnect', function(){
+			$('#msgs').append("Disconnected from the server.");
+			$('#msg').attr('disabled', 'disabled');
+			$('#send').attr('disabled', 'disabled');
+		});
+
+		$('#send').click(function(){
+			var msg = $('#msg').val();
+			socket.emit('send', msg);
+			$('#msg').val(" ");
+		});
+
+		$('#msg').keypress(function(e){
+			if(e.which == 13){
+				var msg = $('#msg').val();
+				socket.emit('send', msg);
+				$('#msg').val(" ");
+			}
+		});
+	</script>
+</body>
+</html>
